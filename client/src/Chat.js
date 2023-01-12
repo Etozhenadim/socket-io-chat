@@ -3,7 +3,7 @@ import ScrollToBottom from "react-scroll-to-bottom";
 
 const Chat = ({ socket, username, room }) => {
   const [currentMessage, setCurrentMessage] = useState("");
-  const [messageList, setMessageList] = useState("");
+  const [messageList, setMessageList] = useState([]);
 
   const sendMessage = async () => {
     if (currentMessage !== "") {
@@ -12,10 +12,14 @@ const Chat = ({ socket, username, room }) => {
         author: username,
         message: currentMessage,
         time:
-          new Date(Date.now()).getHours + ":" + new Date(Date.now()).getMinutes,
+          new Date(Date.now()).getHours() +
+          ":" +
+          new Date(Date.now()).getMinutes(),
       };
 
       await socket.emit("send_message", messageData);
+      setMessageList((list) => [...list, messageData]);
+      setCurrentMessage("");
     }
   };
 
@@ -24,6 +28,7 @@ const Chat = ({ socket, username, room }) => {
       setMessageList((list) => [...list, data]);
     });
   }, [socket]);
+
   return (
     <div className="chat-window">
       <div className="chat-header">
